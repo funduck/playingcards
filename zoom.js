@@ -66,8 +66,22 @@ function zoomOut(scale) {
 }
 
 const zoomLevel = 3;
+const zoomAllLevel = 1.5;
 const zoomKey = 'z';
+const zoomAllKey = 'Z';
 let zoomed = false;
+let zoomedAll = false;
+
+function zoomAll(scale) {
+    document.body.style.zoom = `${parseInt(100 * scale, 10)}%`;
+    if (scale != 1) {
+        document.getElementsByTagName('html')[0].style.overflow = 'scroll'
+        document.getElementsByClassName('ToolBoxToast')[0].style.display = 'none'
+    } else {
+        // document.getElementsByTagName('html')[0].style.overflow = ''
+        document.getElementsByClassName('ToolBoxToast')[0].style.display = ''
+    }
+}
 
 document.addEventListener('keydown', event => {
     if (event.key === zoomKey) {
@@ -77,6 +91,15 @@ document.addEventListener('keydown', event => {
         } else {
             zoomOut(zoomLevel);
             zoomed = false;
+        }
+    }
+    if (event.key === zoomAllKey) {
+        if (!zoomedAll) {
+            zoomAll(zoomAllLevel);
+            zoomedAll = true;
+        } else {
+            zoomAll(1);
+            zoomedAll = false;
         }
     }
 });
