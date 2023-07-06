@@ -1,14 +1,24 @@
-function multiply(str, scale) {
-    const [_,size,unit] = str.match(/(\d+\.?\d*)(\w+)/);
+function getPx(str) {
+    return parseFloat(str.match(/(\d+\.?\d*)px/)[1]);    
+}
+
+function getSize(str) {
+    const [_, size, unit] = str.match(/(\d+\.?\d*)(\w+)/);
+    return {size: parseFloat(size), unit};
+}
+
+function multiplySize(str, scale) {
+    const {size,unit} = getSize(str);
     return `${parseFloat(size)*scale}${unit}`;
 }
 
+const zoomedSet = new Set();
+
 function zoom(el,scale) {
-    const className = `Zoomed${scale}`;
-    if (!el.style.width || el.classList.contains(className)) return;
-    el.style.width = multiply(el.style.width,scale);
-    el.style.height = multiply(el.style.height,scale);
-    el.classList.add(className);
+    if (!el.style.width || zoomedSet.has(el)) return;
+    zoomedSet.add(el);
+    el.style.width = multiplySize(el.style.width,scale);
+    el.style.height = multiplySize(el.style.height,scale);
     el.childNodes.forEach(child => {
         zoom(child,scale);
     });
@@ -23,6 +33,8 @@ function moveIn(el) {
     // if (top < 0) el.style.top = `0px`;
     if (right > innerWidth) el.style.left = `${innerWidth - right}px`;
     if (bottom > innerHeight) el.style.top = `${innerHeight - bottom}px`;
+    el.style.zIndex = 100;
+    
     el.classList.add('MovedIn');
 }
 
@@ -32,37 +44,40 @@ function moveOut(el) {
     el.style.right = '';
     el.style.top = '';
     el.style.bottom = '';
+    el.style.zIndex = '';
 }
 
 function zoomIn(scale) {
-    [...document.querySelectorAll( ":hover" )].filter(el => el.classList.contains('Token')).forEach( el => {
+    [...document.querySelectorAll( ":hover" )]
+    .filter(el => el.classList.contains('Token'))
+    .forEach(el => {
         zoom(el,scale);
         moveIn(el);
     });
 }
 
 function zoomOut(scale) {
-    const className = `Zoomed${scale}`;
-    [...document.getElementsByClassName(className)].forEach(el => {
-        if (!el.style || !el.style.width || !el.classList.contains(className)) return;
-        el.style.width = multiply(el.style.width,1/scale);
-        el.style.height = multiply(el.style.height,1/scale);
-        el.classList.remove(className);
-        
+    [...zoomedSet].forEach(el => {
+        zoomedSet.delete(el);
+        el.style.width = multiplySize(el.style.width,1/scale);
+        el.style.height = multiplySize(el.style.height,1/scale);
         moveOut(el);
     });
 }
 
 const zoomLevel = 3;
 const zoomKey = 'z';
+let zoomed = false;
 
 document.addEventListener('keydown', event => {
     if (event.key === zoomKey) {
-        zoomIn(zoomLevel);
+        if (!zoomed) {
+            zoomIn(zoomLevel);
+            zoomed = true;
+        } else {
+            zoomOut(zoomLevel);
+            zoomed = false;
+        }
     }
 });
-document.addEventListener('keyup', event => {
-    if (event.key === zoomKey) {
-        zoomOut(zoomLevel);
-    }
-});
+
