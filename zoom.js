@@ -66,7 +66,7 @@ function zoomOut(scale) {
 }
 
 const zoomLevel = 3;
-const zoomAllLevel = 1.5;
+const zoomAllLevel = 2;
 const zoomKey = 'z';
 const zoomAllKey = 'Z';
 let zoomed = false;
