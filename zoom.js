@@ -65,13 +65,6 @@ function zoomOut(scale) {
     });
 }
 
-const zoomLevel = 3;
-const zoomAllLevel = 2;
-const zoomKey = 'z';
-const zoomAllKey = 'Z';
-let zoomed = false;
-let zoomedAll = false;
-
 function zoomAll(scale) {
     document.body.style.zoom = `${parseInt(100 * scale, 10)}%`;
     if (scale != 1) {
@@ -83,7 +76,15 @@ function zoomAll(scale) {
     }
 }
 
+const zoomLevel = 3;
+const zoomKey = 'z';
+let zoomed = false;
+
 document.addEventListener('keydown', event => {
+    if (event.shiftKey && event.code.match(/Digit[0-9]/)) {
+        const level = parseInt(event.code.match(/Digit([0-9])/)[1], 10);
+        zoomAll(level);
+    }
     if (event.key === zoomKey) {
         if (!zoomed) {
             zoomIn(zoomLevel);
@@ -93,14 +94,4 @@ document.addEventListener('keydown', event => {
             zoomed = false;
         }
     }
-    if (event.key === zoomAllKey) {
-        if (!zoomedAll) {
-            zoomAll(zoomAllLevel);
-            zoomedAll = true;
-        } else {
-            zoomAll(1);
-            zoomedAll = false;
-        }
-    }
 });
-
