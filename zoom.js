@@ -28,11 +28,12 @@ function moveIn(el) {
     if (el.classList.contains('MovedIn')) return;
     
     const {left, top, right, bottom} = el.getBoundingClientRect();   
-    const {innerWidth, innerHeight} = window;
-    // if (left < 0) el.style.left = `0px`;
-    // if (top < 0) el.style.top = `0px`;
-    if (right > innerWidth) el.style.left = `${innerWidth - right}px`;
-    if (bottom > innerHeight) el.style.top = `${innerHeight - bottom}px`;
+    const box = document.getElementsByClassName('Table__board')[0].getBoundingClientRect();
+
+    if (left < box.left) el.style.left = `${box.left}px`;
+    if (top < box.top) el.style.top = `${box.top}px`;
+    if (right > box.right) el.style.left = `${box.right - right}px`;
+    if (bottom > box.bottom) el.style.top = `${box.bottom - bottom}px`;
     el.style.zIndex = 100;
     
     el.classList.add('MovedIn');
