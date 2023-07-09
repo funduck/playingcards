@@ -77,9 +77,23 @@ function zoomAll(scale) {
     }
 }
 
+function lockDraggable() {
+    const el = [...document.querySelectorAll( ":hover" )]
+    .find(el => el.classList.contains('Token'));
+    Object.keys(el).filter(key => key.match(/__reactEventHandlers/)).forEach(key => {
+        if (el[key].onMouseDown) {
+            el[key].__onMouseDown = el[key].onMouseDown;
+            el[key].onMouseDown = undefined;
+        } else {
+            el[key].onMouseDown = el[key].__onMouseDown;
+        }
+    })
+}
+
 const zoomLevel = 3;
 const zoomKey = 'z';
 let zoomed = false;
+const lockKey = 'l';
 
 document.addEventListener('keydown', event => {
     if (event.shiftKey && event.code.match(/Digit[0-9]/)) {
@@ -94,5 +108,8 @@ document.addEventListener('keydown', event => {
             zoomOut(zoomLevel);
             zoomed = false;
         }
+    }
+    if (event.key === lockKey) {
+        lockDraggable();
     }
 });
